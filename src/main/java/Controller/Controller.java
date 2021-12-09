@@ -172,7 +172,7 @@ public class Controller {
      * @param course: Course
      */
 
-    public void deleteCourse(Course course) {
+    public void deleteCourse(Course course) throws SQLException {
         courseRepository.delete(course);
     }
 

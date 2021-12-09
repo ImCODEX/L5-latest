@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class TeacherRepository extends SQLRepository<Teacher>{
+public class TeacherRepository extends SQLRepository<Teacher> {
 
     public TeacherRepository() throws SQLException {
         super();
@@ -20,7 +20,15 @@ public class TeacherRepository extends SQLRepository<Teacher>{
     public Teacher add(Teacher obj) throws SQLException {
         String SQLQuery = "insert into teacher values(" + obj.getTeacherId() +
                 ", '" + obj.getFirstName() + "', '" + obj.getLastName() + "')";
-        statement.executeQuery(SQLQuery);
+        statement.execute(SQLQuery);
+        String SQLQuery2;
+        if (!obj.getCourses().isEmpty()) {
+            for (Integer id :
+                    obj.getCourses()) {
+                SQLQuery2 = "update course set teacherId = " + obj.getTeacherId() + " where courseId = " + id;
+                statement.execute(SQLQuery2);
+            }
+        }
         return obj;
     }
 
@@ -31,15 +39,15 @@ public class TeacherRepository extends SQLRepository<Teacher>{
         ResultSet resultSet = statement.executeQuery(SQLQuery);
         String SQLQuery2 = "";
         ResultSet resultSet2;
-        while (resultSet.next()){
+        while (resultSet.next()) {
             Teacher tempTeacher = new Teacher();
             tempTeacher.setTeacherId(resultSet.getInt("teacherId"));
             tempTeacher.setFirstName(resultSet.getString("firstName"));
             tempTeacher.setLastName(resultSet.getString("lastName"));
-            SQLQuery2 = "select courseId from course where teacherId = " +tempTeacher.getTeacherId();
+            SQLQuery2 = "select courseId from course where teacherId = " + tempTeacher.getTeacherId();
             resultSet2 = secondStatement.executeQuery(SQLQuery2);
             List<Integer> courses = new ArrayList<>();
-            while(resultSet2.next()){
+            while (resultSet2.next()) {
                 courses.add(resultSet2.getInt("courseId"));
             }
             tempTeacher.setCourses(courses);
@@ -57,10 +65,10 @@ public class TeacherRepository extends SQLRepository<Teacher>{
         tempTeacher.setTeacherId(resultSet.getInt("teacherId"));
         tempTeacher.setFirstName(resultSet.getString("firstName"));
         tempTeacher.setLastName(resultSet.getString("lastName"));
-        String SQLQuery2 = "select courseId from course where teacherId = " +tempTeacher.getTeacherId();
+        String SQLQuery2 = "select courseId from course where teacherId = " + tempTeacher.getTeacherId();
         ResultSet resultSet2 = secondStatement.executeQuery(SQLQuery2);
         List<Integer> courses = new ArrayList<>();
-        while(resultSet2.next()){
+        while (resultSet2.next()) {
             courses.add(resultSet2.getInt("courseId"));
         }
         tempTeacher.setCourses(courses);
@@ -69,7 +77,7 @@ public class TeacherRepository extends SQLRepository<Teacher>{
 
     @Override
     public Teacher update(Teacher oldObject, Teacher newObject) throws SQLException {
-        if(!oldObject.getCourses().isEmpty()){
+        if (!oldObject.getCourses().isEmpty()) {
             String SQLQuery2 = "update course set teacherId = -1 where teacherId = " + oldObject.getTeacherId();
             statement.execute(SQLQuery2);
         }
@@ -78,23 +86,23 @@ public class TeacherRepository extends SQLRepository<Teacher>{
         ResultSet resultSet = statement.executeQuery(SQLQuery);
         resultSet.next();
 
-        if(!Objects.equals(oldObject.getTeacherId(), newObject.getTeacherId())){
+        if (!Objects.equals(oldObject.getTeacherId(), newObject.getTeacherId())) {
             String SQLQuery2 = "update teacher set teacherId = " + newObject.getTeacherId() + " where teacherId = " + oldObject.getTeacherId();
             statement.execute(SQLQuery2);
         }
 
-        if(!Objects.equals(oldObject.getFirstName(), newObject.getFirstName())){
+        if (!Objects.equals(oldObject.getFirstName(), newObject.getFirstName())) {
             String SQLQuery2 = "update teacher set firstName = '" + newObject.getFirstName() + "' where teacherId = " + newObject.getTeacherId();
             statement.execute(SQLQuery2);
         }
 
-        if(!Objects.equals(oldObject.getLastName(), newObject.getLastName())){
+        if (!Objects.equals(oldObject.getLastName(), newObject.getLastName())) {
             String SQLQuery2 = "update teacher set lastName = '" + newObject.getLastName() + "' where teacherId = " + newObject.getTeacherId();
             statement.execute(SQLQuery2);
         }
 
-        if(!newObject.getCourses().isEmpty()){
-            for (Integer courseId:
+        if (!newObject.getCourses().isEmpty()) {
+            for (Integer courseId :
                     newObject.getCourses()) {
                 String SQLQuery2 = "update course set teacherId = " + newObject.getTeacherId() + " where courseId = " + courseId;
                 statement.execute(SQLQuery2);

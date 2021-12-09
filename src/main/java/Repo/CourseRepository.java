@@ -89,7 +89,7 @@ public class CourseRepository extends SQLRepository<Course>{
         }
 
         if(!Objects.equals(oldObject.getName(), newObject.getName())){
-            String SQLQuery2 = "update course set name = " + newObject.getName() + " where courseId = " + newObject.getId();
+            String SQLQuery2 = "update course set name = '" + newObject.getName() + "' where courseId = " + newObject.getId();
             statement.execute(SQLQuery2);
         }
 
@@ -103,7 +103,7 @@ public class CourseRepository extends SQLRepository<Course>{
             statement.execute(SQLQuery2);
         }
 
-        if(!newObject.getStudentsEnrolled().isEmpty()){
+        if(newObject.getStudentsEnrolled() != null){
             for (Integer id:
                     newObject.getStudentsEnrolled()) {
                 String SQLQuery2 = "insert into students_courses values (" + id + ", " + newObject.getId() + ")";
@@ -115,8 +115,11 @@ public class CourseRepository extends SQLRepository<Course>{
     }
 
     @Override
-    public void delete(Course obj) {
-
+    public void delete(Course obj) throws SQLException {
+        String SQLQuery = "delete from students_courses where courseId = " + obj.getId();
+        statement.execute(SQLQuery);
+        String SQLQuery2 = "delete from course where courseId = " + obj.getId();
+        statement.execute(SQLQuery2);
     }
 }
 

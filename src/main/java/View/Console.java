@@ -95,7 +95,7 @@ public class Console {
 
         } catch (Exception e) {
             //controller.saveInput();
-            throw (new CustomExceptions("Invalid Input"));
+            throw (e);
         }
     }
 
