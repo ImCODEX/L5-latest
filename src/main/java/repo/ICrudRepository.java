@@ -1,9 +1,7 @@
-package Repo;
+package repo;
 
-import CustomExceptions.CustomExceptions;
+import customexceptions.CustomExceptions;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 

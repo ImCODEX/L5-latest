@@ -1,3 +1,4 @@
+/* Not needed I guess?
 import CustomExceptions.CustomExceptions;
 import Model.Student;
 import Repo.StudentRepository;
@@ -12,7 +13,7 @@ public class SQLRepoTest {
     private StudentRepository studentRepository;
 
     @BeforeEach
-    void setup() throws SQLException, ClassNotFoundException {
+    void setup() throws SQLException {
         studentRepository = new StudentRepository();
     }
 
@@ -53,3 +54,4 @@ public class SQLRepoTest {
 
 
 }
+*/

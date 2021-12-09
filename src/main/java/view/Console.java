@@ -1,10 +1,9 @@
 
-package View;
+package view;
 
-import Controller.Controller;
-import CustomExceptions.CustomExceptions;
+import controller.Controller;
+import customexceptions.CustomExceptions;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +14,10 @@ import java.util.Scanner;
  * UI
  * Main method runs the user interface
  */
-
 public class Console {
     private final Controller controller;
+    private static final String INVALID_INPUT_EXCEPTION = "Invalid input!";
+    private static final String SELECT_COURSE_BY_ID = "Select the Course(s) by entering Course id:";
 
     public Console(Controller controller) {
         this.controller = controller;
@@ -27,7 +27,6 @@ public class Console {
     /**
      * Print all Courses Method
      */
-
     public void showCourses() throws SQLException {
         controller.getCourses().forEach(System.out::println);
     }
@@ -44,7 +43,6 @@ public class Console {
     /**
      * Print all Teachers Method
      */
-
     public void showTeachers() throws SQLException {
         controller.getTeacher().forEach(System.out::println);
     }
@@ -53,7 +51,6 @@ public class Console {
     /**
      * Print Students sorted by count(enrolledCourses) in descending order
      */
-
     public void showSortStudentsByEnrolledCourses() throws SQLException {
         controller.sortStudentsByEnrolledCourses().forEach(System.out::println);
     }
@@ -62,7 +59,6 @@ public class Console {
     /**
      * Print Courses sorted by credits in descending order
      */
-
     public void showSortCourseByCredits() throws SQLException {
         controller.sortCourseByCredits().forEach(System.out::println);
     }
@@ -72,30 +68,27 @@ public class Console {
      * Update Course Method
      *
      * @throws CustomExceptions in case of Course not found or invalid input
-     * @throws IOException      in case of invalid JSON store format
      */
-
-    public void updateCourse() throws CustomExceptions, IOException, SQLException {
+    public void updateCourse() throws CustomExceptions, SQLException {
         Scanner scanner = new Scanner(System.in);
         showCourses();
         System.out.println("Enter id of Course you want to update:");
         try {
-            Integer oldId = scanner.nextInt();
+            int oldId = scanner.nextInt();
             System.out.println("Now you will need to write a few things that represent Course attributes.");
             System.out.println("Enter Course id:");
-            Integer id = scanner.nextInt();
+            int id = scanner.nextInt();
             System.out.println("Enter Course name:");
             scanner.nextLine(); //throw away the \n not consumed by nextInt()
             String name = scanner.nextLine();
             System.out.println("Enter maximum number of students that can be enrolled:");
-            Integer maxEnrollment = scanner.nextInt();
+            int maxEnrollment = scanner.nextInt();
             System.out.println("Enter Course credits:");
-            Integer credits = scanner.nextInt();
+            int credits = scanner.nextInt();
             controller.updateCourse(oldId, id, name, maxEnrollment, credits);
 
         } catch (Exception e) {
-            //controller.saveInput();
-            throw (e);
+            throw (new CustomExceptions(INVALID_INPUT_EXCEPTION));
         }
     }
 
@@ -104,16 +97,14 @@ public class Console {
      * Update Student Method
      *
      * @throws CustomExceptions in case of Student not found or invalid input
-     * @throws IOException      in case of invalid JSON store format
      */
-
-    public void updateStudent() throws CustomExceptions, IOException, SQLException {
+    public void updateStudent() throws CustomExceptions, SQLException {
         Scanner scanner = new Scanner(System.in);
         showStudents();
         System.out.println("Enter id of Student you want to update:");
 
         try {
-            Integer oldId = scanner.nextInt();
+            int oldId = scanner.nextInt();
             System.out.println("You will need to write a few things that represent Student attributes.");
             System.out.println("Enter Student id:");
             int id = scanner.nextInt();
@@ -127,15 +118,14 @@ public class Console {
             List<Integer> coursesIds = new ArrayList<>();
             showCourses();
             for (int i = 0; i < coursesCount; i++) {
-                System.out.println("Select the Course(s) by entering Course id:");
+                System.out.println(SELECT_COURSE_BY_ID);
                 Integer courseId = scanner.nextInt();
                 coursesIds.add(courseId);
             }
             controller.updateStudent(oldId, firstName, lastName, id, 0, coursesIds);
 
         } catch (Exception e) {
-            //controller.saveInput();
-            throw (new CustomExceptions("Invalid Input"));
+            throw (new CustomExceptions(INVALID_INPUT_EXCEPTION));
         }
 
     }
@@ -145,15 +135,13 @@ public class Console {
      * Update Teacher Method
      *
      * @throws CustomExceptions in case of Teacher not found or invalid input
-     * @throws IOException      in case of invalid JSON store format
      */
-
-    public void updateTeacher() throws CustomExceptions, IOException, SQLException {
+    public void updateTeacher() throws CustomExceptions, SQLException {
         Scanner scanner = new Scanner(System.in);
         showTeachers();
         System.out.println("Enter id of Teacher you want to update:");
         try {
-            Integer oldId = scanner.nextInt();
+            int oldId = scanner.nextInt();
             System.out.println("You will need to write a few things that represent Teacher attributes.");
             System.out.println("Enter Teacher id:");
             int id = scanner.nextInt();
@@ -167,14 +155,13 @@ public class Console {
             List<Integer> coursesIds = new ArrayList<>();
             showCourses();
             for (int i = 0; i < coursesCount; i++) {
-                System.out.println("Select the Course(s) by entering Course id:");
+                System.out.println(SELECT_COURSE_BY_ID);
                 Integer courseId = scanner.nextInt();
                 coursesIds.add(courseId);
             }
             controller.updateTeacher(oldId, firstName, lastName, id, coursesIds);
         } catch (Exception e) {
-            //controller.saveInput();
-            throw (new CustomExceptions("Invalid Input"));
+            throw (new CustomExceptions(INVALID_INPUT_EXCEPTION));
         }
 
     }
@@ -182,28 +169,23 @@ public class Console {
 
     /**
      * Add Course Method
-     *
-     * @throws CustomExceptions in case of invalid input
-     * @throws IOException      in case of invalid JSON store format
      */
-
-    public void addCourse() throws CustomExceptions, IOException, SQLException {
+    public void addCourse() throws CustomExceptions {
         Scanner scanner = new Scanner(System.in);
         System.out.println("You will need to write a few things that represent Course attributes.");
         System.out.println("Enter Course id:");
         try {
-            Integer id = scanner.nextInt();
+            int id = scanner.nextInt();
             System.out.println("Enter Course name:");
             scanner.nextLine(); //throw away the \n not consumed by nextInt()
             String name = scanner.nextLine();
             System.out.println("Enter maximum number of students that can be enrolled:");
-            Integer maxEnrollment = scanner.nextInt();
+            int maxEnrollment = scanner.nextInt();
             System.out.println("Enter Course credits:");
-            Integer credits = scanner.nextInt();
+            int credits = scanner.nextInt();
             controller.addCourse(id, name, maxEnrollment, credits);
         } catch (Exception e) {
-            //controller.saveInput();
-            throw (e);
+            throw (new CustomExceptions(INVALID_INPUT_EXCEPTION));
         }
 
     }
@@ -211,12 +193,8 @@ public class Console {
 
     /**
      * Add Student Method
-     *
-     * @throws CustomExceptions in case of invalid input
-     * @throws IOException      in case of invalid JSON store format
      */
-
-    public void addStudent() throws CustomExceptions, IOException, SQLException {
+    public void addStudent() throws CustomExceptions {
         Scanner scanner = new Scanner(System.in);
         System.out.println("You will need to write a few things that represent Student attributes.");
 
@@ -233,15 +211,14 @@ public class Console {
             List<Integer> coursesIds = new ArrayList<>();
             showCourses();
             for (int i = 0; i < coursesCount; i++) {
-                System.out.println("Select the Course(s) by entering Course id:");
+                System.out.println(SELECT_COURSE_BY_ID);
                 Integer courseId = scanner.nextInt();
                 coursesIds.add(courseId);
             }
             controller.addStudent(firstName, lastName, id, 0, coursesIds);
 
         } catch (Exception e) {
-            //controller.saveInput();
-            throw (e);
+            throw (new CustomExceptions(INVALID_INPUT_EXCEPTION));
         }
     }
 
@@ -250,10 +227,8 @@ public class Console {
      * Teacher Add Method
      *
      * @throws CustomExceptions in case of invalid input
-     * @throws IOException      in case of invalid JSON store format
      */
-
-    public void addTeacher() throws CustomExceptions, IOException {
+    public void addTeacher() throws CustomExceptions {
         Scanner scanner = new Scanner(System.in);
         System.out.println("You will need to write a few things that represent Teacher attributes.");
 
@@ -270,14 +245,13 @@ public class Console {
             List<Integer> coursesIds = new ArrayList<>();
             showCourses();
             for (int i = 0; i < coursesCount; i++) {
-                System.out.println("Select the Course(s) by entering Course id:");
+                System.out.println(SELECT_COURSE_BY_ID);
                 Integer courseId = scanner.nextInt();
                 coursesIds.add(courseId);
             }
             controller.addTeacher(firstName, lastName, id, coursesIds);
         } catch (Exception e) {
-            //controller.saveInput();
-            throw (new CustomExceptions("Invalid Input"));
+            throw (new CustomExceptions(INVALID_INPUT_EXCEPTION));
         }
     }
 
@@ -285,11 +259,9 @@ public class Console {
     /**
      * Course delete Method
      *
-     * @throws IOException      in case of invalid JSON store format
      * @throws CustomExceptions in case of invalid input
      */
-
-    public void deleteCourse() throws IOException, CustomExceptions, SQLException {
+    public void deleteCourse() throws CustomExceptions, SQLException {
         Scanner scanner = new Scanner(System.in);
         showCourses();
         System.out.println("ID of Course you want to delete:");
@@ -297,8 +269,7 @@ public class Console {
             int id = scanner.nextInt();
             controller.deleteCourse(controller.findCourseById(id));
         } catch (Exception e) {
-            //controller.saveInput();
-            throw (new CustomExceptions("Invalid Input"));
+            throw (new CustomExceptions(INVALID_INPUT_EXCEPTION));
         }
 
     }
@@ -307,11 +278,9 @@ public class Console {
     /**
      * Student delete Method
      *
-     * @throws IOException      in case of invalid JSON store format
      * @throws CustomExceptions in case of invalid input
      */
-
-    public void deleteStudent() throws IOException, CustomExceptions, SQLException {
+    public void deleteStudent() throws CustomExceptions, SQLException {
         Scanner scanner = new Scanner(System.in);
         showStudents();
         System.out.println("ID of Student you want to delete:");
@@ -319,8 +288,7 @@ public class Console {
             int id = scanner.nextInt();
             controller.deleteStudent(controller.findStudentById(id));
         } catch (Exception e) {
-            //controller.saveInput();
-            throw (new CustomExceptions("Invalid Input"));
+            throw (new CustomExceptions(INVALID_INPUT_EXCEPTION));
         }
     }
 
@@ -328,11 +296,9 @@ public class Console {
     /**
      * Teacher delete Method
      *
-     * @throws IOException      in case of invalid JSON store format
      * @throws CustomExceptions in case of invalid input
      */
-
-    public void deleteTeacher() throws IOException, CustomExceptions, SQLException {
+    public void deleteTeacher() throws CustomExceptions, SQLException {
         Scanner scanner = new Scanner(System.in);
         showTeachers();
         System.out.println("ID of Teacher you want to delete:");
@@ -340,8 +306,7 @@ public class Console {
             int id = scanner.nextInt();
             controller.deleteTeacher(controller.findTeacherById(id));
         } catch (Exception e) {
-            //controller.saveInput();
-            throw (new CustomExceptions("Invalid Input"));
+            throw (new CustomExceptions(INVALID_INPUT_EXCEPTION));
         }
     }
 
@@ -349,7 +314,6 @@ public class Console {
     /**
      * filterStudentsByLessThenXCourses print Method
      */
-
     public void showFilterStudentsByLessThenXCourses() throws SQLException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Students with less or equal then X enrolled courses will be show.");
@@ -362,7 +326,6 @@ public class Console {
     /**
      * filterCourseByMaxEnrollment print Method
      */
-
     public void showFilterCourseByMaxEnrollment() throws SQLException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Courses with less or equal then X maximum enrollment will be show.");
@@ -376,10 +339,8 @@ public class Console {
      * Main UI run loop
      *
      * @throws CustomExceptions in case of invalid input
-     * @throws IOException      in case of invalid JSON store format
      */
-
-    public void run() throws CustomExceptions, IOException, SQLException {
+    public void run() throws CustomExceptions, SQLException {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
@@ -441,7 +402,7 @@ public class Console {
             } else if (variant == 16) {
                 showFilterCourseByMaxEnrollment();
             } else
-                throw (new CustomExceptions("Invalid input!"));
+                throw (new CustomExceptions(INVALID_INPUT_EXCEPTION));
         }
     }
 }

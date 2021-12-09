@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.util.List;
 import java.util.Objects;
@@ -110,7 +110,7 @@ public class Course {
      * Used especially in update() method from InMemoryRepository.java
      *
      * @param o: another Teacher Object
-     * @return: boolean
+     * @return boolean
      */
     @Override
     public boolean equals(Object o) {

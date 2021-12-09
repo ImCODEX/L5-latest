@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,12 +22,12 @@ public class Teacher extends Person{
      * Teacher Constructor
      * @param firstName: String
      * @param lastName: String
-     * @param courses_: List<Course>
+     * @param courses: List<Course>
      */
-    public Teacher(String firstName, String lastName, int teacherId_, List<Integer> courses_) {
+    public Teacher(String firstName, String lastName, int teacherId, List<Integer> courses) {
         super(firstName, lastName);
-        teacherId = teacherId_;
-        courses = courses_;
+        this.teacherId = teacherId;
+        this.courses = courses;
     }
 
     public int getTeacherId() {
@@ -50,7 +50,7 @@ public class Teacher extends Person{
      * Equals method for comparison
      * Used especially in update() method from InMemoryRepository.java
      * @param o: another Teacher Object
-     * @return: boolean
+     * @return boolean
      */
     @Override
     public boolean equals(Object o){

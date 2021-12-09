@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 
 import java.util.List;
@@ -20,21 +20,21 @@ public class Student extends Person{
      * Student Constructor
      * @param firstName: String
      * @param lastName: String
-     * @param studentId_: int - unique identifier for Student
-     * @param totalCredits_: sum of all Courses credits
+     * @param studentId: int - unique identifier for Student
+     * @param totalCredits: sum of all Courses credits
      */
 
-    public Student(String firstName, String lastName, int studentId_, int totalCredits_) {
+    public Student(String firstName, String lastName, int studentId, int totalCredits) {
         super(firstName, lastName);
-        studentId = studentId_;
-        totalCredits = totalCredits_;
+        this.studentId = studentId;
+        this.totalCredits = totalCredits;
     }
 
-    public Student(String firstName, String lastName, int studentId_, int totalCredits_, List<Integer> enrolledCourses_) {
+    public Student(String firstName, String lastName, int studentId, int totalCredits, List<Integer> enrolledCourses) {
         super(firstName, lastName);
-        studentId = studentId_;
-        totalCredits = totalCredits_;
-        enrolledCourses = enrolledCourses_;
+        this.studentId = studentId;
+        this.totalCredits = totalCredits;
+        this.enrolledCourses = enrolledCourses;
     }
 
     public int getStudentId() {
@@ -66,7 +66,7 @@ public class Student extends Person{
      * Equals method for comparison
      * Used especially in update() method from InMemoryRepository.java
      * @param o: another Student Object
-     * @return: boolean
+     * @return boolean
      */
     @Override
     public boolean equals(Object o){

@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  * Abstract class for Teacher, Student
@@ -7,7 +7,7 @@ public abstract class Person {
     private String firstName;
     private String lastName;
 
-    public Person() {
+    protected Person() {
     }
 
     /**
@@ -15,7 +15,7 @@ public abstract class Person {
      * @param firstName: String
      * @param lastName: String
      */
-    public Person(String firstName, String lastName) {
+    protected Person(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
     }

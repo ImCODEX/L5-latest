@@ -1,160 +1,214 @@
-/*
-import Controller.Controller;
-import CustomExceptions.CustomExceptions;
-import Model.Course;
-import Model.Student;
-import Model.Teacher;
-import Repo.*;
+import controller.Controller;
+import customexceptions.CustomExceptions;
+import model.Course;
+import model.Student;
+import model.Teacher;
+import repo.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ControllerTest {
-    private StudentFileRepository studentFileRepository;
-    private TeacherFileRepository teacherFileRepository;
-    private CourseFileRepository courseFileRepository;
-    private Controller controller;
+class ControllerTest {
+    private final List<Course> courses = new ArrayList<>();
+    private final List<Student> students = new ArrayList<>();
+    private final List<Teacher> teachers = new ArrayList<>();
+    private CourseRepository courseRepository;
+    private CourseRepository courseRepositorySpy;
+    private StudentRepository studentRepository;
+    private StudentRepository studentRepositorySpy;
+    private TeacherRepository teacherRepository;
+    private TeacherRepository teacherRepositorySpy;
+    private Controller controller = null;
 
     @BeforeEach
-    public void setup() throws IOException {
-        courseFileRepository = new CourseFileRepository();
-        teacherFileRepository = new TeacherFileRepository(courseFileRepository);
-        studentFileRepository = new StudentFileRepository(courseFileRepository);
-        controller = new Controller(courseFileRepository, studentFileRepository, teacherFileRepository);
-        controller.startInput();
+    public void setup() throws SQLException {
+        courseRepository = Mockito.mock(CourseRepository.class);
+        studentRepository = Mockito.mock(StudentRepository.class);
+        teacherRepository = Mockito.mock(TeacherRepository.class);
 
-        JsonManualRepair jsonManualRepair = new JsonManualRepair();
-        jsonManualRepair.repairJSON();
+        controller = new Controller(courseRepository, studentRepository, teacherRepository);
+
+        Course courseBazeDeDate = new Course(0, "Baze de date", 5, 6);
+        Course courseStructuriDeDate = new Course(1, "Structuri de date si algoritmi", 2, 5);
+        courses.add(courseBazeDeDate);
+        courses.add(courseStructuriDeDate);
+        Mockito.when(courseRepository.getAll()).thenReturn(courses);
+
+        Student studentRazvan = new Student("Razvan", "Postescu", 103050, 0, List.of(0));
+        Student studentMarius = new Student("Marius", "Pop", 103051, 0, List.of(1));
+        Student studentAndrei = new Student("Andrei", "Marian", 103052, 0, List.of(0,1));
+        students.add(studentRazvan);
+        students.add(studentMarius);
+        students.add(studentAndrei);
+        Mockito.when(studentRepository.getAll()).thenReturn(students);
+
+        Teacher teacherDorel = new Teacher("Dorel", "Bob", 1, List.of(0,1));
+        teachers.add(teacherDorel);
+        Mockito.when(teacherRepository.getAll()).thenReturn(teachers);
+
+
+        Mockito.when(courseRepository.add(new Course(2, "Algebra", 7, 5))).thenReturn(new Course(2, "Algebra", 7, 5));
+        Mockito.when(studentRepository.add(new Student("Codrut", "Irimie", 103053, 0, List.of(1,2)))).thenReturn(new Student("Codrut", "Irimie", 103053, 0, List.of(1,2)));
+        Mockito.when(teacherRepository.add(new Teacher("Dor", "Dob", 2, List.of(2)))).thenReturn(new Teacher("Dor", "Dob", 2, List.of(2)));
+
+        Mockito.when(courseRepository.find(0)).thenReturn(new Course(0, "Baze de date", 5, 6));
+        Mockito.when(studentRepository.find(103050)).thenReturn(new Student("Razvan", "Postescu", 103050, 0, List.of(0)));
+        Mockito.when(teacherRepository.find(1)).thenReturn(new Teacher("Dorel", "Bob", 1, List.of(0,1)));
+
+        Mockito.when(courseRepository.update(new Course(0, "Baze de date", 5, 6),
+                new Course(0, "Baze de date2", 15, 6)))
+                        .thenReturn(new Course(0, "Baze de date2", 15, 6));
+
+        Mockito.when(studentRepository.update(
+                new Student("Razvan", "Postescu", 103050, 0, List.of(0)),
+                new Student("Razvan", "Postescu", 103050, 0, List.of(0,1)))).
+                thenReturn(new Student("Razvan", "Postescu", 103050, 0, List.of(0,1)));
+
+        Mockito.when(teacherRepository.update(new Teacher("Dorel", "Bob", 1, List.of(0,1)),
+                new Teacher("Dorel2", "Bob", 1, List.of(0,1)))).
+                thenReturn(new Teacher("Dorel2", "Bob", 1, List.of(0,1)));
+
+        courseRepositorySpy = Mockito.spy(courseRepository);
+        Mockito.doNothing().when(courseRepositorySpy).delete(new Course(100, "Baze de date2", 15, 6));
+
+        studentRepositorySpy = Mockito.spy(studentRepository);
+        Mockito.doNothing().when(studentRepositorySpy).delete(new Student("Razvan", "Postescu", 103050999, 0, List.of(0)));
+
+        teacherRepositorySpy = Mockito.spy(teacherRepository);
+        Mockito.doNothing().when(teacherRepositorySpy).delete(new Teacher("Dorel", "Bob", 1999, List.of(0,1)));
+
+        Mockito.when(studentRepository.find(103052)).thenReturn(new Student("Andrei", "Marian", 103052, 0, List.of(0,1)));
+
+    }
+
+
+    @Test
+    void testGetCourses() throws SQLException {
+        assertEquals(courses, controller.getCourses());
+        Mockito.verify(courseRepository).getAll();
     }
 
     @Test
-    public void testAddCourse() throws CustomExceptions, IOException {
-        controller.addCourse(5, "Algoritmica Grafelor", 5, 6);
-        assertEquals(controller.findCourseById(5),
-                new Course(5, "Algoritmica Grafelor", 5, 6));
-        controller.saveInput();
+    void testGetStudents() throws SQLException {
+        assertEquals(students, controller.getStudents());
+        Mockito.verify(studentRepository).getAll();
     }
 
     @Test
-    public void testAddStudent() throws CustomExceptions, IOException {
-        List<Integer> listOfId = new ArrayList<>();
-        listOfId.add(1);
-        controller.addStudent("nume", "prenume", 555, 10, listOfId);
-        assertEquals(controller.findStudentById(555), new Student("nume", "prenume", 555, 10, new ArrayList<>(controller.findStudentById(555).getEnrolledCourses())));
-
-        controller.saveInput();
+    void testGetTeachers() throws SQLException {
+        assertEquals(teachers, controller.getTeacher());
+        Mockito.verify(teacherRepository).getAll();
     }
 
     @Test
-    public void testAddTeacher() throws CustomExceptions, IOException {
-        List<Integer> coursesID = new ArrayList<>();
-        coursesID.add(1);
-        List<Course> courses = new ArrayList<>();
-        courses.add(controller.findCourseById(1));
-        controller.addTeacher("Dorel", "Bob", 1, coursesID);
-        assertEquals(controller.findTeacherById(1), new Teacher("Dorel", "Bob", 1, courses));
+    void testAddCourse() throws SQLException {
+        assertEquals(new Course(2, "Algebra", 7, 5), controller.addCourse(2, "Algebra", 7, 5));
+        Mockito.verify(courseRepository).add(new Course(2, "Algebra", 7, 5));
 
-        controller.saveInput();
+    }
+
+
+    @Test
+    void testAddStudent() throws SQLException {
+        assertEquals(new Student("Codrut", "Irimie", 103053, 0, List.of(1,2)), controller.addStudent("Codrut", "Irimie", 103053, 0, List.of(1,2)));
+        Mockito.verify(studentRepository).add(new Student("Codrut", "Irimie", 103053, 0, List.of(1,2)));
+        
     }
 
     @Test
-    public void testUpdateCourse() throws CustomExceptions, IOException {
-        int id = 0;
-        controller.updateCourse(0, 0, "cursTest", 999, 9);
-        assertEquals(controller.findCourseById(0), new Course(0, "cursTest", 999, 9));
-
-        controller.saveInput();
+    void testAddTeacher() throws SQLException {
+        assertEquals(new Teacher("Dor", "Dob", 2, List.of(2)), controller.addTeacher("Dor", "Dob", 2, List.of(2)));
+        Mockito.verify(teacherRepository).add(new Teacher("Dor", "Dob", 2, List.of(2)));
+        
     }
 
     @Test
-    public void testUpdateStudent() throws CustomExceptions, IOException {
-        int id = 0;
-        List<Integer> listIds = new ArrayList<>();
-        listIds.add(0);
-        controller.updateStudent(0, "studenttest", "whatever", 5, 2, listIds);
-        assertEquals(controller.findStudentById(5), new Student("studenttest", "whatever", 5, 2, controller.findStudentById(5).getEnrolledCourses()));
+    void testUpdateCourse() throws CustomExceptions, SQLException {
+        assertEquals(new Course(0, "Baze de date2", 15, 6), controller.updateCourse(0, 0, "Baze de date2", 15, 6));
+        Mockito.verify(courseRepository).update(new Course(0, "Baze de date", 5, 6), new Course(0, "Baze de date2", 15, 6));
 
-        controller.saveInput();
     }
 
     @Test
-    public void testUpdateTeacher() throws CustomExceptions, IOException {
-        int id = 0;
-        List<Integer> listIds = new ArrayList<>();
-        listIds.add(0);
-        controller.updateTeacher(1, "testTeacher", "whatever", 4, listIds);
-        assertEquals(controller.findTeacherById(4), new Teacher("testTeacher", "whatever", 4, controller.findTeacherById(4).getCourses()));
+    void testUpdateStudent() throws CustomExceptions, SQLException {
+        assertEquals(new Student("Razvan", "Postescu", 103050, 0, List.of(0,1)), controller.updateStudent(103050, "Razvan", "Postescu", 103050, 0, List.of(0,1)));
+        Mockito.verify(studentRepository).update(new Student("Razvan", "Postescu", 103050, 0, List.of(0)), new Student("Razvan", "Postescu", 103050, 0, List.of(0,1)));
 
-        controller.saveInput();
     }
 
     @Test
-    public void testDeleteCourse() throws CustomExceptions, IOException {
-        assertEquals(controller.getCourses().size(), 3);
-        controller.deleteCourse(controller.findCourseById(0));
-        assertEquals(controller.getCourses().size(), 2);
-
-        controller.saveInput();
+    void testUpdateTeacher() throws CustomExceptions, SQLException {
+        assertEquals(new Teacher("Dorel2", "Bob", 1, List.of(0,1)), controller.updateTeacher(1, "Dorel2", "Bob", 1, List.of(0,1)));
+        Mockito.verify(teacherRepository).update(new Teacher("Dorel", "Bob", 1, List.of(0,1)), new Teacher("Dorel2", "Bob", 1, List.of(0,1)));
+        
     }
 
     @Test
-    public void testDeleteStudent() throws CustomExceptions, IOException {
-        assertEquals(controller.getStudents().size(), 4);
-        controller.deleteStudent(controller.findStudentById(103050));
-        assertEquals(controller.getStudents().size(), 3);
+    void testDeleteCourse() throws SQLException {
+        Controller controller1 = new Controller(courseRepositorySpy, studentRepository, teacherRepository);
+        controller1.deleteCourse(new Course(100, "Baze de date2", 15, 6));
+        Mockito.verify(courseRepositorySpy).delete(new Course(100, "Baze de date2", 15, 6));
 
-        controller.saveInput();
     }
 
     @Test
-    public void testDeleteTeacher() throws CustomExceptions, IOException {
-        assertEquals(controller.getTeacher().size(), 2);
-        controller.deleteTeacher(controller.findTeacherById(2));
-        assertEquals(controller.getTeacher().size(), 1);
+    void testDeleteStudent() throws SQLException {
+        Controller controller1 = new Controller(courseRepository, studentRepositorySpy, teacherRepository);
+        controller1.deleteStudent(new Student("Razvan", "Postescu", 103050999, 0, List.of(0)));
+        Mockito.verify(studentRepositorySpy).delete(new Student("Razvan", "Postescu", 103050999, 0, List.of(0)));
 
-        controller.saveInput();
     }
 
     @Test
-    public void testSortStudentsByEnrolledCourses() throws IOException, CustomExceptions {
+    void testDeleteTeacher() throws SQLException {
+        Controller controller1 = new Controller(courseRepository, studentRepository, teacherRepositorySpy);
+        controller1.deleteTeacher(new Teacher("Dorel", "Bob", 1999, List.of(0,1)));
+        Mockito.verify(teacherRepositorySpy).delete(new Teacher("Dorel", "Bob", 1999, List.of(0,1)));
+
+    }
+
+    @Test
+    void testSortStudentsByEnrolledCourses() throws CustomExceptions, SQLException {
         assertNotEquals(controller.sortStudentsByEnrolledCourses(), controller.getStudents());
-        assertEquals(controller.sortStudentsByEnrolledCourses().get(0), controller.findStudentById(103051));
-        controller.saveInput();
+        assertEquals(controller.findStudentById(103052), controller.sortStudentsByEnrolledCourses().get(0));
+        
     }
 
     @Test
-    public void testSortCourseByCredits() throws IOException {
+    void testSortCourseByCredits() throws SQLException {
         assertEquals(controller.sortCourseByCredits(), controller.getCourses());
-        controller.saveInput();
+        
     }
 
     @Test
-    public void testFilterStudentsByLessThenXCourses() throws IOException {
-        assertNotEquals(controller.filterStudentsByLessThenXCourses(2), controller.getStudents());
+    void testFilterStudentsByLessThenXCourses() throws SQLException {
+        assertNotEquals(controller.filterStudentsByLessThenXCourses(1), controller.getStudents());
         for (Student s:
-                controller.filterStudentsByLessThenXCourses(2)) {
-            assertTrue(s.getEnrolledCourses().size() <= 2);
+                controller.filterStudentsByLessThenXCourses(1)) {
+            assertTrue(s.getEnrolledCourses().size() <= 1);
         }
-        controller.saveInput();
+        
     }
 
     @Test
-    public void testFilterCourseByMaxEnrollment() throws IOException {
-        assertNotEquals(controller.filterCourseByMaxEnrollment(5), controller.getCourses());
+    void testFilterCourseByMaxEnrollment() throws SQLException {
+        assertNotEquals(controller.filterCourseByMaxEnrollment(2), controller.getCourses());
         for (Course c:
-             controller.filterCourseByMaxEnrollment(5)) {
-            assertTrue(c.getMaxEnrollment() <= 5);
+             controller.filterCourseByMaxEnrollment(2)) {
+            assertTrue(c.getMaxEnrollment() <= 2);
         }
 
-        controller.saveInput();
+        
     }
+
+
+
 
 
 }
-*/
+
