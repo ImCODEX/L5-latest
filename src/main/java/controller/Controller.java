@@ -16,7 +16,6 @@ import java.util.Objects;
 /**
  * Controller Class
  */
-
 public class Controller {
     private final CourseRepository courseRepository;
     private final StudentRepository studentRepository;
@@ -26,11 +25,10 @@ public class Controller {
     /**
      * Controller makes use of 3 FileRepositories
      *
-     * @param courseFileRepository:
-     * @param studentFileRepository:
-     * @param teacherFileRepository:
+     * @param courseFileRepository: Repository for Course
+     * @param studentFileRepository: Repository for Student
+     * @param teacherFileRepository: Repository for Teacher
      */
-
     public Controller(CourseRepository courseFileRepository, StudentRepository studentFileRepository, TeacherRepository teacherFileRepository) {
         this.courseRepository = courseFileRepository;
         this.teacherRepository = teacherFileRepository;
@@ -44,7 +42,6 @@ public class Controller {
      *
      * @return List<Course>
      */
-
     public List<Course> getCourses() throws SQLException {
         return courseRepository.getAll();
     }
@@ -55,7 +52,6 @@ public class Controller {
      *
      * @return List<Student>
      */
-
     public List<Student> getStudents() throws SQLException {
         return studentRepository.getAll();
     }
@@ -66,7 +62,6 @@ public class Controller {
      *
      * @return List<Teacher>
      */
-
     public List<Teacher> getTeacher() throws SQLException {
         return teacherRepository.getAll();
     }
@@ -86,7 +81,6 @@ public class Controller {
      * @param coursesId:     List<Integer>
      * @return Student
      */
-
     public Student addStudent(String firstName, String lastName, int studentId, int totalCredits, List<Integer> coursesId) throws SQLException {
         return studentRepository.add(new Student(firstName, lastName, studentId, totalCredits, coursesId));
     }
@@ -101,7 +95,6 @@ public class Controller {
      * @param courses:   List<Integer>
      * @return Teacher
      */
-
     public Teacher addTeacher(String firstName, String lastName, int teacherId, List<Integer> courses) throws SQLException {
         return teacherRepository.add(new Teacher(firstName, lastName, teacherId, courses));
     }
@@ -113,7 +106,6 @@ public class Controller {
      * @param id: Int
      * @return Course
      */
-
     public Course findCourseById(int id) throws SQLException {
         return courseRepository.find(id);
     }
@@ -125,7 +117,6 @@ public class Controller {
      * @param id: Int
      * @return Student
      */
-
     public Student findStudentById(int id) throws SQLException {
         return studentRepository.find(id);
     }
@@ -137,7 +128,6 @@ public class Controller {
      * @param id: Int
      * @return Teacher
      */
-
     public Teacher findTeacherById(int id) throws SQLException {
         return teacherRepository.find(id);
     }
@@ -148,7 +138,6 @@ public class Controller {
      *
      * @param course: Course
      */
-
     public void deleteCourse(Course course) throws SQLException {
         courseRepository.delete(course);
     }
@@ -159,7 +148,6 @@ public class Controller {
      *
      * @param student: Student
      */
-
     public void deleteStudent(Student student) throws SQLException {
         studentRepository.delete(student);
     }
@@ -170,7 +158,6 @@ public class Controller {
      *
      * @param teacher: Teacher
      */
-
     public void deleteTeacher(Teacher teacher) throws SQLException {
         teacherRepository.delete(teacher);
     }
@@ -186,7 +173,6 @@ public class Controller {
      * @param credits:       Int
      * @throws CustomExceptions in case of Course not found
      */
-
     public Course updateCourse(int oldCourseId, int id, String name, int maxEnrollment, int credits) throws CustomExceptions, SQLException {
         Course tempCourse = findCourseById(oldCourseId);
         if (Objects.equals(name, ""))
@@ -207,7 +193,6 @@ public class Controller {
      * @param coursesId:     List<Integer>
      * @throws CustomExceptions in case of Student not found
      */
-
     public Student updateStudent(long oldStudentId, String firstName, String lastName, int studentId, int totalCredits, List<Integer> coursesId) throws CustomExceptions, SQLException {
         Student tempStudent = findStudentById((int) oldStudentId);
         if (Objects.equals(firstName, ""))
@@ -229,7 +214,6 @@ public class Controller {
      * @param courses:   List<Integer>
      * @throws CustomExceptions in case of Teacher not found
      */
-
     public Teacher updateTeacher(int oldId, String firstName, String lastName, int teacherId, List<Integer> courses) throws CustomExceptions, SQLException {
         Teacher tempTeacher = findTeacherById(oldId);
         if (Objects.equals(firstName, ""))
@@ -249,7 +233,6 @@ public class Controller {
      *
      * @return List<Student>
      */
-
     public List<Student> sortStudentsByEnrolledCourses() throws SQLException {
         return studentRepository.getAll().stream().sorted((x, y) -> (y.getEnrolledCourses().size() - x.getEnrolledCourses().size())).toList();
     }
@@ -261,7 +244,6 @@ public class Controller {
      *
      * @return List<Course>
      */
-
     public List<Course> sortCourseByCredits() throws SQLException {
         return courseRepository.getAll().stream().sorted((x, y) -> (y.getCredits() - x.getCredits())).toList();
     }
@@ -274,7 +256,6 @@ public class Controller {
      * @param coursesCount: user given integer for filter
      * @return List<Student>
      */
-
     public List<Student> filterStudentsByLessThenXCourses(Integer coursesCount) throws SQLException {
         return studentRepository.getAll().stream().filter(x -> x.getEnrolledCourses().size() <= coursesCount).toList();
     }
@@ -287,7 +268,6 @@ public class Controller {
      * @param enrollmentCount: user given integer for filter
      * @return List<Course>
      */
-
     public List<Course> filterCourseByMaxEnrollment(Integer enrollmentCount) throws SQLException {
         return courseRepository.getAll().stream().filter(x -> x.getMaxEnrollment() <= enrollmentCount).toList();
     }
